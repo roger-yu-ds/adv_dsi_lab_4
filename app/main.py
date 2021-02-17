@@ -10,25 +10,28 @@ models_dir = project_dir / 'models'
 app = FastAPI()
 gmm_pipe = load(models_dir / 'gmm_pipe.joblib')
 
-@api.get("/")
+
+@app.get("/")
 def read_root():
-	return {"Hello": "World"}
-	
-@api.get("/health")
+    return {"Hello": "World"}
+
+
+@app.get("/health", status_code=200)
 def healthcheck():
-	return "GMM clustering is all ready to go!"
-	
-def format_features(genre, age, income, spending):
-	result = {'genre': genre,
-			  'age': age,
-			  'income': income,
-			  'spending': spending}
-	return result
-	
+    return "GMM clustering is all ready to go!"
+
+
+def format_features(genre: str, age:int, income:int, spending:int):
+    result = {'genre': [genre],
+              'age': [age],
+              'Annual Income (k$)': [income],
+              'spending Score (1-100)': [spending]}
+    return result
+
+
 @app.get('/mall/customers/segmentation')
-def predict(genre, age, income, spending):
-	df = pd.DataFrame(format_features(genre, age, income, spending))
-	prediction = gmm_pipe.predict(df)
-	str_pred = np.array2string(prediction)
-	
-	return jsonify(str_pred)
+def predict(genre: str, age: int, income:int, spending:int):
+    obs = pd.DataFrame(format_features(genre, age, income, spending))
+    prediction = gmm_pipe.predict(obs)
+
+    return JSONResponse(prediction.tolist())
