@@ -4,7 +4,7 @@ RUN conda install yellowbrick
 
 RUN pip install mlflow==1.13
 
-RUN conda install build-dep python-psycopg2
+RUN conda install psycopg2
 
 RUN pip install psycopg2-binary==2.8.5
 
