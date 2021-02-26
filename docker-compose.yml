@@ -1,0 +1,48 @@
+version: '3.7'
+
+services:
+    postgres:
+        image: postgres:11
+        restart: always
+        environment:
+            - POSTGRES_USER=mlflow
+            - POSTGRES_DB=mlflow
+            - POSTGRES_PASSWORD=mlflow
+        ports:
+            - "5432:5432"
+    jupyter:
+        restart: always
+        build:
+            context: .
+            dockerfile: ./Dockerfile
+        container_name: jupyter_docker
+        ports:
+            - "8888:8888"
+        environment:
+            - JUPYTER_ENABLE_LAB=yes
+            - MLFLOW_TRACKING_URI='http://mlflow:5000'
+        volumes:
+            - ../adv_dsi_lab_4:/home/jovyan/work
+            - ../adv_dsi/src:/home/jovyan/work/src
+            - ./mlflow/mlruns:/mlflow/mlruns
+        depends_on: 
+            - mlflow
+    mlflow:
+        restart: always
+        build:
+            context: .
+            dockerfile: mlflow/Dockerfile
+        container_name: mlflow_server
+        ports:
+            - "5000:5000"
+        volumes:
+            - ./mlflow/mlruns:/mlflow/mlruns
+        depends_on:
+            - postgres
+        command: mlflow server --host 0.0.0.0 --backend-store-uri postgresql+psycopg2://mlflow:mlflow@postgres:5432/mlflow --default-artifact-root /mlflow/mlruns
+
+volumes:
+    adv_dsi_lab_4:
+    mlruns:
+    mlstore:
+    dbdata:
