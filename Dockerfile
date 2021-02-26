@@ -1,11 +1,15 @@
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7
+FROM jupyter/scipy-notebook:0ce64578df46
 
-COPY requirements.txt .
+RUN conda install yellowbrick
 
-RUN pip install -r requirements.txt
+RUN pip install mlflow==1.13
 
-COPY ./app /app
 
-COPY ./models /models
 
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "-c", "/gunicorn_conf.py", "main:app"]
+RUN pip install psycopg2-binary==2.8.5
+
+ENV PYTHONPATH "${PYTHONPATH}:/home/jovyan/work"
+
+RUN echo "export PYTHONPATH=/home/jovyan/work" >> ~/.bashrc
+
+WORKDIR /home/jovyan/work
