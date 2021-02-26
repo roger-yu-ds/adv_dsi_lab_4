@@ -3,12 +3,16 @@ from starlette.responses import JSONResponse
 from joblib import load
 import pandas as pd
 from pathlib import Path
+from dotenv import find_dotenv
 
-project_dir = Path.cwd()
-models_dir = project_dir / 'models'
+# project_dir = Path(find_dotenv()).parent
+# print(f'Project dir: {project_dir}')
+# models_dir = project_dir / 'models'
+# gmm_pipe_dir = models_dir / 'gmm_pipe.joblib'
+# print(f'gmm_pipe_dir.is_dir(): {gmm_pipe_dir.is_dir()}')
 
 app = FastAPI()
-gmm_pipe = load(models_dir / 'gmm_pipe.joblib')
+gmm_pipe = load('../models/gmm_pipe.joblib')
 
 
 @app.get("/")
@@ -22,8 +26,8 @@ def healthcheck():
 
 
 def format_features(genre: str, age:int, income:int, spending:int):
-    result = {'genre': [genre],
-              'age': [age],
+    result = {'Gender': [genre],
+              'Age': [age],
               'Annual Income (k$)': [income],
               'spending Score (1-100)': [spending]}
     return result
